@@ -37,13 +37,17 @@ fun Screen3() {
 
 
     val context = LocalContext.current
-    Column ( modifier = Modifier.padding(horizontal = 20.dp).fillMaxSize(),
+    Column ( modifier = Modifier.padding(horizontal = 75.dp).fillMaxSize()
+        .background(brush = Brush.verticalGradient(listOf(Color.Blue, Color.White))),
+
+
+
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally){
         Slider(value = sliderValue, onValueChange = { sliderValue=it }, Modifier.fillMaxWidth()
             , enabled = chkd)
 
-        Text (fontSize = 20.sp, text = "Second Screen" )
+        Text (fontSize = 20.sp, text = "Second Screen" + sliderValue.toString())
 
         Button(onClick = { val newInt = Intent(Intent.ACTION_VIEW)
             newInt.setData(Uri.parse("tel:6314202000"))

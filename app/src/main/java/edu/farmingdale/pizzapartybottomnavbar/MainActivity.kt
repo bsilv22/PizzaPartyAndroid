@@ -21,31 +21,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             PizzaPartyBottomNavBarTheme {
+                // Create NavController
                 val navController: NavHostController = rememberNavController()
-                var buttonsVisible by remember { mutableStateOf(true) }
 
-                Scaffold(
-
-                    bottomBar = {
-                        if (buttonsVisible) {
-                            BottomBar(
-                                navController = navController,
-                                state = buttonsVisible,
-                                modifier = Modifier
-                            )
-                        }
-                    }) { paddingValues ->
-                    Box(
-                        modifier = Modifier.padding(paddingValues)
-                    ) {
-                        NavigationGraph(navController = navController) {
-                                isVisible ->
-                            buttonsVisible = isVisible
-                        }
-                    }
-                }
+                // Call the NavigationGraph that includes the DrawerNavigationMenu
+                NavigationGraph(navController)
             }
         }
     }
-
 }

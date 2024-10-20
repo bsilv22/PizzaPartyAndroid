@@ -24,20 +24,58 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import kotlin.math.ceil
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
 // ToDo 6: Add another level of hunger that is Hungry that is in between Medium and Very hungry
 
 // ToDo 7: Using the ViewModel class, create a new ViewModel class called PizzaPartyViewModel as
 // a subclass of ViewModel. Add the following properties to the PizzaPartyViewModel - see Brightspace
 
-@Composable
-fun PizzaPartyScreen( modifier: Modifier = Modifier) {
-    var totalPizzas by remember { mutableIntStateOf(0) }
-    var numPeopleInput by remember { mutableStateOf("") }
-    var hungerLevel by remember { mutableStateOf("Medium") }
+class PizzaPartyViewModel : ViewModel() {
+    var numPeopleInput by mutableStateOf("")
+        private set
 
+    var hungerLevel by mutableStateOf("Medium")
+        private set
+
+    var totalPizzas by mutableStateOf(0)
+        private set
+
+    fun updateNumPeople(input: String) {
+        numPeopleInput = input
+    }
+
+    fun updateHungerLevel(level: String) {
+        hungerLevel = level
+    }
+
+    fun calculatePizzas() {
+        viewModelScope.launch {
+            val numPeople = numPeopleInput.toIntOrNull() ?: 0
+            totalPizzas = calculateNumPizzas(numPeople, hungerLevel)
+        }
+    }
+
+    private fun calculateNumPizzas(numPeople: Int, hungerLevel: String): Int {
+        val slicesPerPizza = 8
+        val slicesPerPerson = when (hungerLevel) {
+            "Light" -> 2
+            "Medium" -> 3
+            else -> 5
+        }
+        return ceil(numPeople * slicesPerPerson / slicesPerPizza.toDouble()).toInt()
+    }
+}
+
+@Composable
+fun PizzaPartyScreen(
+    viewModel: PizzaPartyViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier.padding(10.dp)
     ) {
@@ -48,32 +86,28 @@ fun PizzaPartyScreen( modifier: Modifier = Modifier) {
         )
         NumberField(
             labelText = "Number of people?",
-            textInput = numPeopleInput,
-            onValueChange = { numPeopleInput = it },
+            textInput = viewModel.numPeopleInput,
+            onValueChange = { viewModel.updateNumPeople(it) },
             modifier = modifier.padding(bottom = 16.dp).fillMaxWidth()
         )
         RadioGroup(
             labelText = "How hungry?",
-            radioOptions = listOf("Light", "Medium", "Very hungry"),
-            selectedOption = hungerLevel,
-            onSelected = { hungerLevel = it },
+            radioOptions = listOf("Light", "Medium", "Hungry", "Very hungry"),
+            selectedOption = viewModel.hungerLevel,
+            onSelected = { viewModel.updateHungerLevel(it) },
             modifier = modifier
         )
         Text(
-            text = "Total pizzas: $totalPizzas",
+            text = "Total pizzas: ${viewModel.totalPizzas}",
             fontSize = 22.sp,
             modifier = modifier.padding(top = 16.dp, bottom = 16.dp)
         )
         Button(
-            onClick = {            totalPizzas = calculateNumPizzas(numPeopleInput.toInt(),
-                hungerLevel)
-
-            },
+            onClick = { viewModel.calculatePizzas() },
             modifier = modifier.fillMaxWidth()
         ) {
             Text("Calculate")
         }
-
     }
 }
 
@@ -84,7 +118,6 @@ fun NumberField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-
     TextField(
         value = textInput,
         onValueChange = onValueChange,
@@ -132,19 +165,3 @@ fun RadioGroup(
         }
     }
 }
-
-
-fun calculateNumPizzas(
-    numPeople: Int,
-    hungerLevel: String
-): Int {
-    val slicesPerPizza = 8
-    val slicesPerPerson = when (hungerLevel) {
-        "Light" -> 2
-        "Medium" -> 3
-        else -> 5
-    }
-
-    return ceil(numPeople * slicesPerPerson / slicesPerPizza.toDouble()).toInt()
-}
-
