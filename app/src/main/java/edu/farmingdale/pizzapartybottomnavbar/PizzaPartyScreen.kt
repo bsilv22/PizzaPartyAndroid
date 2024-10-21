@@ -20,8 +20,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
@@ -80,9 +84,12 @@ fun PizzaPartyScreen(
         modifier = modifier.padding(10.dp)
     ) {
         Text(
-            text = "Pizza Party",
+            text = "🍕 Pizza Party 🍕",
             fontSize = 38.sp,
-            modifier = modifier.padding(bottom = 16.dp)
+            color = Color(0xFFFF5722),
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(16.dp).shadow(4.dp)
         )
         NumberField(
             labelText = "Number of people?",
